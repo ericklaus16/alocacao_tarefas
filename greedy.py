@@ -103,7 +103,7 @@ ax2.tick_params(axis='y', labelcolor='tab:red')
 
 lines = [tempo_line, memoria_line]
 labels = [line.get_label() for line in lines]
-ax1.legend(lines, labels, loc='upper right')  # ou 'lower left', 'upper right' etc.
+ax1.legend(lines, labels, loc='upper right') 
 
 plt.title('Tempo e Memória por Iteração')
 fig.tight_layout()
