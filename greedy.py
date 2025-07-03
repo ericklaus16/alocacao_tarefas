@@ -1,7 +1,8 @@
 import time
 import tracemalloc
 import matplotlib.pyplot as plt
-from extra_functions import quick_sort, temRecursoDisponivel
+
+from extra_functions import quick_sort, temRecursoDisponivel, plota
 
 caminho_arq = "entries/Aula5000.txt"
 
@@ -31,11 +32,9 @@ for c in range(6):
         quick_sort(horarios_inicio, 0, len(horarios_inicio) - 1)
         quick_sort(horarios_fim, 0, len(horarios_fim) - 1)
         tracemalloc.start()
-        print(f"\n======= RODADA {c + 1} =======")
         tempo_inicio = time.time()
 
     while len(horarios_inicio) != 0:
-        primeira = True
         menor = horarios_inicio[0]
         fim_horario = horarios_fim[0]
 
@@ -71,22 +70,4 @@ for c in range(6):
     #     tempo_total = sum(fim - inicio for inicio, fim in recurso)
     #     print(f"Recurso {i + 1}: {len(recurso)} tarefas, {tempo_total} horas alocadas")
 
-fig, ax1 = plt.subplots()
-
-ax1.set_xlabel('Iterações')
-ax1.set_ylabel('Tempo (s)', color='tab:blue')
-tempo_line, = ax1.plot(iteracoes, tempos, marker='o', color='tab:blue', label='Tempo')
-ax1.tick_params(axis='y', labelcolor='tab:blue')
-
-ax2 = ax1.twinx() 
-ax2.set_ylabel('Memória (KB)', color='tab:red')
-memoria_line, = ax2.plot(iteracoes, memorias, marker='s', color='tab:red', label='Memória')
-ax2.tick_params(axis='y', labelcolor='tab:red')
-
-lines = [tempo_line, memoria_line]
-labels = [line.get_label() for line in lines]
-ax1.legend(lines, labels, loc='upper right') 
-
-plt.title('Tempo e Memória por Iteração')
-fig.tight_layout()
-plt.show()
+plota(plt, iteracoes, tempos, memorias)
