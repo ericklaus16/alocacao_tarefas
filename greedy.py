@@ -1,8 +1,9 @@
 import time
 import tracemalloc
 import matplotlib.pyplot as plt
+from extra_functions import quick_sort, temRecursoDisponivel
 
-caminho_arq = "entries/Aula100.txt"
+caminho_arq = "entries/Aula5000.txt"
 
 tempos = []
 memorias = []
@@ -11,11 +12,6 @@ iteracoes = ['2ª', '3ª', '4ª', '5ª', '6ª']
 for c in range(6):
     tempo_inicio = 0
     tempo_fim = 0
-
-    if c != 0:
-        tracemalloc.start()
-        print(f"\n======= RODADA {c + 1} =======")
-        tempo_inicio = time.time()
 
     horarios_inicio = []
     horarios_fim = []
@@ -31,43 +27,29 @@ for c in range(6):
             else:
                 horarios_fim = list(map(int, linha.strip().split(" ")))
 
-    def temRecursoDisponivel(inicio, fim):
-        for idx, recurso in enumerate(escalonamento):
-            conflito = False
-
-            for ocupado_inicio, ocupado_fim in recurso:
-                # Duas tarefas conflitam se há sobreposição no tempo
-                # NÃO conflitam se: nova termina antes/quando existente começa OU nova começa depois/quando existente termina
-                if not (fim <= ocupado_inicio or inicio >= ocupado_fim):
-                    conflito = True
-                    break
-                    
-            if not conflito:
-                # print(f"Recurso {idx+1} DISPONÍVEL para tarefa ({inicio},{fim})")
-                return idx  # Este recurso pode acomodar a nova tarefa
-            # else:
-            #     print(f"Recurso {idx+1} OCUPADO")
-                
-        # print(f"Nenhum recurso disponível para ({inicio},{fim}), criando novo recurso!")
-        return False
+    if c != 0:
+        quick_sort(horarios_inicio, 0, len(horarios_inicio) - 1)
+        quick_sort(horarios_fim, 0, len(horarios_fim) - 1)
+        tracemalloc.start()
+        print(f"\n======= RODADA {c + 1} =======")
+        tempo_inicio = time.time()
 
     while len(horarios_inicio) != 0:
         primeira = True
-        menor = min(horarios_inicio)
-        indice = horarios_inicio.index(menor)
-        fim_horario = horarios_fim[indice]
+        menor = horarios_inicio[0]
+        fim_horario = horarios_fim[0]
 
         # print(f"Analisando tarefa [{menor}, {fim_horario}]")
         
-        recursoDisponivel = temRecursoDisponivel(menor, fim_horario)
+        recursoDisponivel = temRecursoDisponivel(escalonamento, menor, fim_horario)
 
         if recursoDisponivel is False:     
             escalonamento.append([(menor, fim_horario)])
         else:
             escalonamento[recursoDisponivel].append((menor, fim_horario))
         
-        horarios_inicio.pop(indice)
-        horarios_fim.pop(indice)
+        horarios_inicio.pop(0)
+        horarios_fim.pop(0)
     
     if(c != 0):
         tempo_fim = time.time()
