@@ -1,13 +1,15 @@
 import time
 import tracemalloc
 import matplotlib.pyplot as plt
+import statistics
 
 from extra_functions import quick_sort, temRecursoDisponivel, plota
 
-caminho_arq = "entries/Aula5000.txt"
+caminho_arq = "entries/Aula100.txt"
 
 tempos = []
 memorias = []
+desvios_padroes = []
 iteracoes = ['2ª', '3ª', '4ª', '5ª', '6ª']
 
 for c in range(6):
@@ -54,9 +56,21 @@ for c in range(6):
         tempo_fim = time.time()
         current, peak = tracemalloc.get_traced_memory()
         tracemalloc.stop()
-        
+
         tempos.append(tempo_fim - tempo_inicio)
         memorias.append(peak / 1024)
+
+        horas_por_recurso = []
+        for recurso in escalonamento:
+            horas_total = sum(fim - inicio for inicio, fim in recurso)
+            horas_por_recurso.append(horas_total)
+
+        if len(horas_por_recurso) > 1:
+            desvio_padrao = statistics.stdev(horas_por_recurso)
+        else:
+            desvio_padrao = 0.0
+        
+        desvios_padroes.append(desvio_padrao)
 
         # print(f"Tempo de execução: {tempo_fim - tempo_inicio:.6f}s")
         # print(f"Memória utilizada: {peak / 1024:.2f}KB")
@@ -70,4 +84,4 @@ for c in range(6):
     #     tempo_total = sum(fim - inicio for inicio, fim in recurso)
     #     print(f"Recurso {i + 1}: {len(recurso)} tarefas, {tempo_total} horas alocadas")
 
-plota(plt, iteracoes, tempos, memorias)
+plota(plt, iteracoes, tempos, memorias, desvios_padroes)

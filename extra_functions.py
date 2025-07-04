@@ -42,7 +42,7 @@ def temRecursoDisponivel(escalonamento, inicio, fim):
     # print(f"Nenhum recurso disponível para ({inicio},{fim}), criando novo recurso!")
     return False
 
-def plota(plt, iteracoes, tempos, memorias):
+def plota(plt, iteracoes, tempos, memorias, desvios_padroes):
     fig, ax1 = plt.subplots()
 
     ax1.set_xlabel('Iterações')
@@ -55,10 +55,16 @@ def plota(plt, iteracoes, tempos, memorias):
     memoria_line, = ax2.plot(iteracoes, memorias, marker='s', color='tab:red', label='Memória')
     ax2.tick_params(axis='y', labelcolor='tab:red')
 
-    lines = [tempo_line, memoria_line]
-    labels = [line.get_label() for line in lines]
-    ax1.legend(lines, labels, loc='upper right') 
+    ax3 = ax1.twinx()
+    ax3.spines['right'].set_position(('outward', 60))  # Posiciona o eixo mais à direita
+    ax3.set_ylabel('Desvio Padrão (horas)', color='tab:green')
+    desvio_line, = ax3.plot(iteracoes, desvios_padroes, marker='^', color='tab:green', label='Desvio Padrão')
+    ax3.tick_params(axis='y', labelcolor='tab:green')
 
-    plt.title('Tempo e Memória por Iteração')
+    lines = [tempo_line, memoria_line, desvio_line]
+    labels = [line.get_label() for line in lines]
+    ax1.legend(lines, labels, loc='upper left') 
+
+    plt.title('Tempo, Memória e Desvio Padrão por Iteração')
     fig.tight_layout()
     plt.show()
