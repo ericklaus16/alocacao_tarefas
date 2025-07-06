@@ -9,19 +9,20 @@ def quick_sort(vet, left, right):
             i += 1
         while vet[j] > pivo and j > left:
             j -= 1
-        
+
         if i <= j:
             y = vet[i]
             vet[i] = vet[j]
             vet[j] = y
             i += 1
             j -= 1
-    
+
     if i > left:
         quick_sort(vet, left, j)
-    
+
     if i < right:
         quick_sort(vet, i, right)
+
 
 def temRecursoDisponivel(escalonamento, inicio, fim):
     for idx, recurso in enumerate(escalonamento):
@@ -32,38 +33,71 @@ def temRecursoDisponivel(escalonamento, inicio, fim):
             if not (fim <= ocupado_inicio or inicio >= ocupado_fim):
                 conflito = True
                 break
-                
+
         if not conflito:
             # print(f"Recurso {idx+1} DISPONÍVEL para tarefa ({inicio},{fim})")
             return idx  # Este recurso pode acomodar a nova tarefa
         # else:
         #     print(f"Recurso {idx+1} OCUPADO")
-            
+
     # print(f"Nenhum recurso disponível para ({inicio},{fim}), criando novo recurso!")
     return False
+
+
+def temRecursoDisponivelBalanceado(escalonamento, inicio, fim):
+    recursos_disponiveis = {}
+
+    for idx, recurso in enumerate(escalonamento):
+        conflito = False
+
+        for ocupado_inicio, ocupado_fim in recurso:
+            if not (fim <= ocupado_inicio or inicio >= ocupado_fim):
+                conflito = True
+                break
+
+        if not conflito:
+            # Calcula tempo total ocupado neste recurso
+            tempo_total = 0
+            for ocupado_inicio, ocupado_fim in recurso:
+                tempo_total += ocupado_fim - ocupado_inicio
+
+            recursos_disponiveis[idx] = tempo_total
+
+    # Escolhe o recurso com MENOR tempo ocupado (mais balanceado)
+    if recursos_disponiveis:
+        melhor_recurso = min(recursos_disponiveis, # Verificar com o Andrezão se é correto usar o min aqui
+                             key=recursos_disponiveis.get)
+        return melhor_recurso
+    else:
+        return False
+
 
 def plota(plt, iteracoes, tempos, memorias, desvios_padroes):
     fig, ax1 = plt.subplots()
 
     ax1.set_xlabel('Iterações')
     ax1.set_ylabel('Tempo (s)', color='tab:blue')
-    tempo_line, = ax1.plot(iteracoes, tempos, marker='o', color='tab:blue', label='Tempo')
+    tempo_line, = ax1.plot(iteracoes, tempos, marker='o',
+                           color='tab:blue', label='Tempo')
     ax1.tick_params(axis='y', labelcolor='tab:blue')
 
-    ax2 = ax1.twinx() 
+    ax2 = ax1.twinx()
     ax2.set_ylabel('Memória (KB)', color='tab:red')
-    memoria_line, = ax2.plot(iteracoes, memorias, marker='s', color='tab:red', label='Memória')
+    memoria_line, = ax2.plot(
+        iteracoes, memorias, marker='s', color='tab:red', label='Memória')
     ax2.tick_params(axis='y', labelcolor='tab:red')
 
     ax3 = ax1.twinx()
-    ax3.spines['right'].set_position(('outward', 60))  # Posiciona o eixo mais à direita
+    # Posiciona o eixo mais à direita
+    ax3.spines['right'].set_position(('outward', 60))
     ax3.set_ylabel('Desvio Padrão (horas)', color='tab:green')
-    desvio_line, = ax3.plot(iteracoes, desvios_padroes, marker='^', color='tab:green', label='Desvio Padrão')
+    desvio_line, = ax3.plot(iteracoes, desvios_padroes,
+                            marker='^', color='tab:green', label='Desvio Padrão')
     ax3.tick_params(axis='y', labelcolor='tab:green')
 
     lines = [tempo_line, memoria_line, desvio_line]
     labels = [line.get_label() for line in lines]
-    ax1.legend(lines, labels, loc='upper left') 
+    ax1.legend(lines, labels, loc='upper left')
 
     plt.title('Tempo, Memória e Desvio Padrão por Iteração')
     fig.tight_layout()
