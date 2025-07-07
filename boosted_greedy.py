@@ -5,40 +5,39 @@ import statistics
 
 from extra_functions import quick_sort, temRecursoDisponivelBalanceado, plota
 
-caminho_arq = "entries/Aula100.txt"
+caminho_arq = "entries/Aula1000.txt"
 
 tempos = []
 memorias = []
 desvios_padroes = []
+recursos = []
 iteracoes = ['2ª', '3ª', '4ª', '5ª', '6ª']
 
 for c in range(6):
     tempo_inicio = 0
     tempo_fim = 0
 
-    horarios_inicio = []
-    horarios_fim = []
-
+    horarios = []
     escalonamento = []
 
     contador = 0
     with open(caminho_arq, 'r') as arq:
-        for linha in arq:
-            if contador == 0:
-                horarios_inicio = list(map(int, linha.strip().split(" ")))
-                contador += 1
-            else:
-                horarios_fim = list(map(int, linha.strip().split(" ")))
+        linhas = arq.readlines()
+        horarios_inicio = list(map(int, linhas[0].strip().split(" ")))
+        horarios_fim = list(map(int, linhas[1].strip().split(" ")))
+        
+        horarios = list(zip(horarios_inicio, horarios_fim))
 
     if c != 0:
-        quick_sort(horarios_inicio, 0, len(horarios_inicio) - 1)
-        quick_sort(horarios_fim, 0, len(horarios_fim) - 1)
+        # print(horarios)
+        quick_sort(horarios, 0, len(horarios) - 1)
+        # print(horarios)
         tracemalloc.start()
         tempo_inicio = time.time()
 
-    while len(horarios_inicio) != 0:
-        menor = horarios_inicio[0]
-        fim_horario = horarios_fim[0]
+    while len(horarios) != 0:
+        menor = horarios[0][0]
+        fim_horario = horarios[0][1]
 
         # print(f"Analisando tarefa [{menor}, {fim_horario}]")
 
@@ -50,8 +49,7 @@ for c in range(6):
         else:
             escalonamento[recursoDisponivel].append((menor, fim_horario))
 
-        horarios_inicio.pop(0)
-        horarios_fim.pop(0)
+        horarios.pop(0)
 
     if (c != 0):
         tempo_fim = time.time()
@@ -60,6 +58,7 @@ for c in range(6):
 
         tempos.append(tempo_fim - tempo_inicio)
         memorias.append(peak / 1024)
+        recursos.append(len(escalonamento))
 
         horas_por_recurso = []
         for recurso in escalonamento:
@@ -67,7 +66,7 @@ for c in range(6):
             horas_por_recurso.append(horas_total)
 
         if len(horas_por_recurso) > 1:
-            desvio_padrao = statistics.stdev(horas_por_recurso)
+            desvio_padrao = statistics.pstdev(horas_por_recurso)
         else:
             desvio_padrao = 0.0
 
@@ -76,7 +75,7 @@ for c in range(6):
         # print(f"Tempo de execução: {tempo_fim - tempo_inicio:.6f}s")
         # print(f"Memória utilizada: {peak / 1024:.2f}KB")
 
-    print("")
+    # print("")
     # for i, recurso in enumerate(escalonamento):
     #     print(f"Recurso {i + 1}: {recurso}")
 
@@ -85,4 +84,4 @@ for c in range(6):
     #     tempo_total = sum(fim - inicio for inicio, fim in recurso)
     #     print(f"Recurso {i + 1}: {len(recurso)} tarefas, {tempo_total} horas alocadas")
 
-plota(plt, iteracoes, tempos, memorias, desvios_padroes)
+plota(plt, iteracoes, tempos, memorias, desvios_padroes, recursos, "Boosted")

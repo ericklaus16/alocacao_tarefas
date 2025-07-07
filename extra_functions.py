@@ -1,3 +1,5 @@
+import matplotlib.ticker as ticker
+
 def quick_sort(vet, left, right):
     i = left
     j = right
@@ -57,10 +59,7 @@ def temRecursoDisponivelBalanceado(escalonamento, inicio, fim):
 
         if not conflito:
             # Calcula tempo total ocupado neste recurso
-            tempo_total = 0
-            for ocupado_inicio, ocupado_fim in recurso:
-                tempo_total += ocupado_fim - ocupado_inicio
-
+            tempo_total = sum(fim - inicio for inicio, fim in recurso)
             recursos_disponiveis[idx] = tempo_total
 
     # Escolhe o recurso com MENOR tempo ocupado (mais balanceado)
@@ -72,33 +71,45 @@ def temRecursoDisponivelBalanceado(escalonamento, inicio, fim):
         return False
 
 
-def plota(plt, iteracoes, tempos, memorias, desvios_padroes):
-    fig, ax1 = plt.subplots()
-
+def plota(plt, iteracoes, tempos, memorias, desvios_padroes, recursos, modo = "Clássico"):
+    fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(12, 10))
+    
+    # Gráfico 1 - Tempo
+    ax1.plot(iteracoes, tempos, marker='o', color='tab:blue', label='Tempo')
     ax1.set_xlabel('Iterações')
     ax1.set_ylabel('Tempo (s)', color='tab:blue')
-    tempo_line, = ax1.plot(iteracoes, tempos, marker='o',
-                           color='tab:blue', label='Tempo')
     ax1.tick_params(axis='y', labelcolor='tab:blue')
-
-    ax2 = ax1.twinx()
+    ax1.set_title('Tempo de Execução por Iteração')
+    ax1.grid(True, alpha=0.3)
+    
+    # Gráfico 2 - Memória
+    ax2.plot(iteracoes, memorias, marker='s', color='tab:red', label='Memória')
+    ax2.set_xlabel('Iterações')
     ax2.set_ylabel('Memória (KB)', color='tab:red')
-    memoria_line, = ax2.plot(
-        iteracoes, memorias, marker='s', color='tab:red', label='Memória')
     ax2.tick_params(axis='y', labelcolor='tab:red')
-
-    ax3 = ax1.twinx()
-    # Posiciona o eixo mais à direita
-    ax3.spines['right'].set_position(('outward', 60))
+    ax2.set_title('Memória Utilizada por Iteração')
+    ax2.grid(True, alpha=0.3)
+    
+    # Gráfico 3 - Desvio Padrão
+    ax3.plot(iteracoes, desvios_padroes, marker='^', color='tab:green', label='Desvio Padrão')
+    ax3.set_xlabel('Iterações')
     ax3.set_ylabel('Desvio Padrão (horas)', color='tab:green')
-    desvio_line, = ax3.plot(iteracoes, desvios_padroes,
-                            marker='^', color='tab:green', label='Desvio Padrão')
     ax3.tick_params(axis='y', labelcolor='tab:green')
-
-    lines = [tempo_line, memoria_line, desvio_line]
-    labels = [line.get_label() for line in lines]
-    ax1.legend(lines, labels, loc='upper left')
-
-    plt.title('Tempo, Memória e Desvio Padrão por Iteração')
-    fig.tight_layout()
+    ax3.set_title('Desvio Padrão das Horas por Iteração')
+    ax3.grid(True, alpha=0.3)
+    
+    # Gráfico 4 - Recursos Alocados
+    ax4.plot(iteracoes, recursos, marker='8', color='tab:orange', label='Recursos Alocados')
+    ax4.set_xlabel('Iterações')
+    ax4.set_ylabel('Recursos Alocados', color='tab:orange')
+    ax4.tick_params(axis='y', labelcolor='tab:orange')
+    ax4.set_title('Recursos Alocados por Iteração')
+    ax4.yaxis.set_major_locator(ticker.MaxNLocator(integer=True))
+    ax4.grid(True, alpha=0.3)
+    
+    # Título geral
+    fig.suptitle(f'Análise de Performance do Algoritmo Greedy {modo}', fontsize=16)
+    
+    # Ajustar layout
+    plt.tight_layout()
     plt.show()
