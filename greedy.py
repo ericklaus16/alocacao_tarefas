@@ -11,10 +11,15 @@ tempos = []
 memorias = []
 recursos = []
 desvios_padroes = []
-iteracoes = ['2ª', '3ª', '4ª', '5ª', '6ª']
+arquivos = os.listdir('entries')
 
-for arquivo in os.listdir('entries'):
+for arquivo in arquivos:
     caminho_arq = f"entries/{arquivo}"
+
+    custo_medio_memoria_local = 0
+    custo_medio_tempo_local = 0
+    custo_medio_recurso_local = 0
+    custo_medio_dp_local = 0
 
     for c in range(6):
         tempo_inicio = 0
@@ -59,9 +64,9 @@ for arquivo in os.listdir('entries'):
             current, peak = tracemalloc.get_traced_memory()
             tracemalloc.stop()
 
-            tempos.append(tempo_fim - tempo_inicio)
-            memorias.append(peak / 1024)
-            recursos.append(len(escalonamento))
+            custo_medio_tempo_local += (tempo_fim - tempo_inicio)
+            custo_medio_memoria_local += peak / 1024
+            custo_medio_recurso_local += len(escalonamento)
 
             horas_por_recurso = []
             for recurso in escalonamento:
@@ -76,10 +81,16 @@ for arquivo in os.listdir('entries'):
             else:
                 desvio_padrao = 0.0
             
-            desvios_padroes.append(desvio_padrao)
+            custo_medio_dp_local += desvio_padrao
 
             # print(f"Tempo de execução: {tempo_fim - tempo_inicio:.6f}s")
             # print(f"Memória utilizada: {peak / 1024:.2f}KB")
+        
+        if (c == 5):
+            tempos.append(custo_medio_tempo_local / 5)
+            memorias.append(custo_medio_memoria_local / 5)
+            recursos.append(custo_medio_recurso_local / 5)
+            desvios_padroes.append(custo_medio_dp_local / 5)
 
         # print("")
         # for i, recurso in enumerate(escalonamento):
@@ -90,4 +101,4 @@ for arquivo in os.listdir('entries'):
         #     tempo_total = sum(fim - inicio for inicio, fim in recurso)
         #     print(f"Recurso {i + 1}: {len(recurso)} tarefas, {tempo_total} horas alocadas")
 
-plota(plt, iteracoes / 28, tempos / 28, memorias / 28, desvios_padroes / 28, recursos / 28)
+plota(plt, arquivos, tempos, memorias, desvios_padroes, recursos)
