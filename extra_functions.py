@@ -75,52 +75,71 @@ def temRecursoDisponivelBalanceado(escalonamento, inicio, fim):
 def extrai_numeros(arquivos):
     return [int(re.search(r'\d+', nome).group()) for nome in arquivos]
 
-def plota(plt, arquivos, tempos, memorias, desvios_padroes, recursos, modo = "Clássico"):
-    entradas = [int(re.search(r'\d+', nome).group()) for nome in arquivos]
-    dados_ordenados = sorted(zip(entradas, tempos, memorias, desvios_padroes, recursos))
-    entradas, tempos, memorias, desvios_padroes, recursos = zip(*dados_ordenados)
+def plota(plt, arquivos, 
+    tempos, memorias, desvios_padroes, recursos,
+    tempos_boosted, memorias_boosted, desvios_padroes_boosted, recursos_boosted
+):
+    entradas_originais = [int(re.search(r'\d+', nome).group()) for nome in arquivos]
+
+    dados_ordenados_classico = sorted(zip(entradas_originais, tempos, memorias, desvios_padroes, recursos))
+    entradas, tempos, memorias, desvios_padroes, recursos = zip(*dados_ordenados_classico)
+
+    dados_ordenados_boosted = sorted(zip(entradas_originais, tempos_boosted, memorias_boosted, desvios_padroes_boosted, recursos_boosted))
+    entradas_boosted, tempos_boosted, memorias_boosted, desvios_padroes_boosted, recursos_boosted = zip(*dados_ordenados_boosted)
 
     fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(12, 10))
     
     # Gráfico 1 - Tempo
-    ax1.plot(entradas, tempos, marker='o', color='tab:blue', label='Tempo')
+    ax1.plot(entradas, tempos, marker='o', color='tab:blue', label='Versão Clássica')
+    ax1.plot(entradas_boosted, tempos_boosted, marker='o', color='tab:red', label='Versão Balanceada')
     ax1.set_xlabel('Entradas')
     ax1.set_xticks(entradas)
+    ax1.set_xticklabels(entradas, rotation=90, ha='right')
     ax1.set_ylabel('Tempo (s)', color='tab:blue')
     ax1.tick_params(axis='y', labelcolor='tab:blue')
     ax1.set_title('Tempo de Execução por Iteração')
+    ax1.legend()
     ax1.grid(True, alpha=0.3)
     
     # Gráfico 2 - Memória
-    ax2.plot(entradas, memorias, marker='s', color='tab:red', label='Memória')
+    ax2.plot(entradas, memorias, marker='o', color='tab:blue', label='Versão Clássica')
+    ax2.plot(entradas_boosted, memorias_boosted, marker='o', color='tab:red', label='Versão Balanceada')
     ax2.set_xlabel('# de Entradas')
     ax2.set_xticks(entradas)
+    ax2.set_xticklabels(entradas, rotation=90, ha='right')
     ax2.set_ylabel('Memória (KB)', color='tab:red')
     ax2.tick_params(axis='y', labelcolor='tab:red')
     ax2.set_title('Memória Utilizada por Iteração')
+    ax2.legend()
     ax2.grid(True, alpha=0.3)
     
     # Gráfico 3 - Desvio Padrão
-    ax3.plot(entradas, desvios_padroes, marker='^', color='tab:green', label='Desvio Padrão')
+    ax3.plot(entradas, desvios_padroes, marker='o', color='tab:blue', label='Versão Clássica')
+    ax3.plot(entradas_boosted, desvios_padroes_boosted, marker='o', color='tab:red', label='Versão Balanceada')
     ax3.set_xlabel('Entradas')
     ax3.set_xticks(entradas)
+    ax3.set_xticklabels(entradas, rotation=90)
     ax3.set_ylabel('Desvio Padrão (horas)', color='tab:green')
     ax3.tick_params(axis='y', labelcolor='tab:green')
     ax3.set_title('Desvio Padrão das Horas por Iteração')
+    ax3.legend()
     ax3.grid(True, alpha=0.3)
     
     # Gráfico 4 - Recursos Alocados
-    ax4.plot(entradas, recursos, marker='8', color='tab:orange', label='Recursos Alocados')
+    ax4.plot(entradas, recursos, marker='o', color='tab:blue', label='Versão Clássica')
+    ax4.plot(entradas_boosted, recursos_boosted, marker='o', color='tab:red', label='Versão Balanceada')
     ax4.set_xlabel('Entradas')
     ax4.set_xticks(entradas)
+    ax4.set_xticklabels(entradas, rotation=90)
     ax4.set_ylabel('Recursos Alocados', color='tab:orange')
     ax4.tick_params(axis='y', labelcolor='tab:orange')
     ax4.set_title('Recursos Alocados por Iteração')
     ax4.yaxis.set_major_locator(ticker.MaxNLocator(integer=True))
+    ax4.legend()
     ax4.grid(True, alpha=0.3)
     
     # Título geral
-    fig.suptitle(f'Análise de Performance do Algoritmo Greedy {modo}', fontsize=16)
+    fig.suptitle(f'Análise de Performance do Algoritmo Greedy', fontsize=16)
     
     # Ajustar layout
     plt.tight_layout()
