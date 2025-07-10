@@ -88,7 +88,17 @@ def plota(plt, arquivos,
     entradas_boosted, tempos_boosted, memorias_boosted, desvios_padroes_boosted, recursos_boosted = zip(*dados_ordenados_boosted)
 
     fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(12, 10))
+
+    print(f"Tempos Clássico: {tempos}")
+    print(f"Memorias Classico: {memorias}")
+    print(f"DPs Clássico: {desvios_padroes}")
+    print(f"Recursos Clássico: {recursos}")
     
+    print(f"Tempos Boosted: {tempos_boosted}")
+    print(f"Memorias Boosted: {memorias_boosted}")
+    print(f"DPs Boosted: {desvios_padroes_boosted}")
+    print(f"Recursos Boosted: {recursos_boosted}")
+
     # Gráfico 1 - Tempo
     ax1.plot(entradas, tempos, marker='o', color='tab:blue', label='Versão Clássica')
     ax1.plot(entradas_boosted, tempos_boosted, marker='o', color='tab:red', label='Versão Balanceada')
