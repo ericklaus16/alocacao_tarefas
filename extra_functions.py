@@ -70,6 +70,37 @@ def temRecursoDisponivelBalanceado(escalonamento, inicio, fim):
         return melhor_recurso
     else:
         return False
+    
+def temRecursoDisponivelBalanceadoRoundRobin(escalonamento, inicio, fim, ultimo_rec_alocado):
+    if not escalonamento:
+        return False, 0
+   
+    num_recursos = len(escalonamento)
+    recursos_disponiveis = {}
+
+    janela_busca = min(15, num_recursos)
+    
+    inicio_busca = (ultimo_rec_alocado + 1) % num_recursos
+
+    for i in range(janela_busca):
+        idx = (inicio_busca + i) % num_recursos
+        recurso = escalonamento[idx]
+        conflito = False
+        
+        for ocupado_inicio, ocupado_fim in recurso:
+            if not (fim <= ocupado_inicio or inicio >= ocupado_fim):
+                conflito = True
+                break
+            
+        if not conflito:
+            carga_total_horas = sum(o_fim - o_inicio for o_inicio, o_fim in recurso)
+            recursos_disponiveis[idx] = carga_total_horas
+            
+    if recursos_disponiveis:
+        melhor_recurso = min(recursos_disponiveis, key=recursos_disponiveis.get)
+        return melhor_recurso, melhor_recurso
+    else:
+        return False, ultimo_rec_alocado
 
 
 def extrai_numeros(arquivos):
@@ -152,5 +183,50 @@ def plota(plt, arquivos,
     fig.suptitle(f'Análise de Performance do Algoritmo Greedy', fontsize=16)
     
     # Ajustar layout
+    plt.tight_layout()
+    plt.show()
+
+def plota_simples(plt, iteracoes, tempos, memorias, desvios_padroes, recursos, titulo):
+    """
+    Plota dados de apenas um algoritmo (sem comparação)
+    """
+    fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(12, 10))
+    
+    # Gráfico 1 - Tempo de Execução
+    ax1.plot(iteracoes, tempos, marker='o', color='tab:blue', linewidth=2)
+    ax1.set_xlabel('Iterações')
+    ax1.set_ylabel('Tempo (s)', color='tab:blue')
+    ax1.tick_params(axis='y', labelcolor='tab:blue')
+    ax1.set_title('Tempo de Execução por Iteração')
+    ax1.grid(True, alpha=0.3)
+    
+    # Gráfico 2 - Memória Utilizada
+    ax2.plot(iteracoes, memorias, marker='s', color='tab:red', linewidth=2)
+    ax2.set_xlabel('Iterações')
+    ax2.set_ylabel('Memória (KB)', color='tab:red')
+    ax2.tick_params(axis='y', labelcolor='tab:red')
+    ax2.set_title('Memória Utilizada por Iteração')
+    ax2.grid(True, alpha=0.3)
+    
+    # Gráfico 3 - Desvio Padrão
+    ax3.plot(iteracoes, desvios_padroes, marker='^', color='tab:green', linewidth=2)
+    ax3.set_xlabel('Iterações')
+    ax3.set_ylabel('Desvio Padrão (horas)', color='tab:green')
+    ax3.tick_params(axis='y', labelcolor='tab:green')
+    ax3.set_title('Desvio Padrão das Horas por Iteração')
+    ax3.grid(True, alpha=0.3)
+    
+    # Gráfico 4 - Recursos Alocados
+    ax4.plot(iteracoes, recursos, marker='d', color='tab:orange', linewidth=2)
+    ax4.set_xlabel('Iterações')
+    ax4.set_ylabel('Recursos Alocados', color='tab:orange')
+    ax4.tick_params(axis='y', labelcolor='tab:orange')
+    ax4.set_title('Recursos Alocados por Iteração')
+    ax4.grid(True, alpha=0.3)
+    
+    # Título geral
+    fig.suptitle(f'Análise de Performance - {titulo}', fontsize=16, fontweight='bold')
+    
+    # Ajustar layout para evitar sobreposição
     plt.tight_layout()
     plt.show()

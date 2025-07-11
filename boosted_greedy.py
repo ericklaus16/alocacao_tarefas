@@ -3,7 +3,7 @@ import tracemalloc
 import matplotlib.pyplot as plt
 import statistics
 
-from extra_functions import quick_sort, temRecursoDisponivelBalanceado, plota
+from extra_functions import plota_simples, quick_sort, temRecursoDisponivelBalanceado, temRecursoDisponivelBalanceadoRoundRobin
 
 caminho_arq = "entries/Aula1000.txt"
 
@@ -29,9 +29,6 @@ for c in range(6):
         horarios = list(zip(horarios_inicio, horarios_fim))
 
     if c != 0:
-        # print(horarios)
-        quick_sort(horarios, 0, len(horarios) - 1)
-        # print(horarios)
         tracemalloc.start()
         tempo_inicio = time.time()
 
@@ -41,11 +38,14 @@ for c in range(6):
 
         # print(f"Analisando tarefa [{menor}, {fim_horario}]")
 
-        recursoDisponivel = temRecursoDisponivelBalanceado(
-            escalonamento, menor, fim_horario)
+        recursoDisponivel, ultimo_rec_alocado = temRecursoDisponivelBalanceadoRoundRobin(
+            escalonamento, menor, fim_horario, ultimo_rec_alocado)
+        
+        # recursoDisponivel = temRecursoDisponivelBalanceado(escalonamento, menor, fim_horario)
 
         if recursoDisponivel is False:
             escalonamento.append([(menor, fim_horario)])
+            ultimo_rec_alocado = len(escalonamento) - 1
         else:
             escalonamento[recursoDisponivel].append((menor, fim_horario))
 
@@ -84,4 +84,4 @@ for c in range(6):
     #     tempo_total = sum(fim - inicio for inicio, fim in recurso)
     #     print(f"Recurso {i + 1}: {len(recurso)} tarefas, {tempo_total} horas alocadas")
 
-plota(plt, iteracoes, tempos, memorias, desvios_padroes, recursos, "Boosted")
+plota_simples(plt, iteracoes, tempos, memorias, desvios_padroes, recursos, "Algoritmo Balanceado")
