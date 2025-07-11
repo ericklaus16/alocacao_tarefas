@@ -3,9 +3,9 @@ import tracemalloc
 import matplotlib.pyplot as plt
 import statistics
 
-from extra_functions import plota_simples, quick_sort, temRecursoDisponivelBalanceado, temRecursoDisponivelBalanceadoRoundRobin
+from extra_functions import plota_simples, quick_sort, temRecursoDisponivel, temRecursoDisponivelBalanceado, temRecursoDisponivelOtimizada
 
-caminho_arq = "entries/Aula1000.txt"
+caminho_arq = "entries/Aula1500.txt"
 
 tempos = []
 memorias = []
@@ -41,10 +41,10 @@ for c in range(6):
 
         # print(f"Analisando tarefa [{menor}, {fim_horario}]")
 
-        recursoDisponivel, ultimo_rec_alocado = temRecursoDisponivelBalanceadoRoundRobin(
+        recursoDisponivel, ultimo_rec_alocado = temRecursoDisponivelOtimizada(
             escalonamento, menor, fim_horario, ultimo_rec_alocado)
         
-        # recursoDisponivel = temRecursoDisponivelBalanceado(escalonamento, menor, fim_horario)
+        # recursoDisponivel = temRecursoDisponivel(escalonamento, menor, fim_horario)
 
         if recursoDisponivel is False:
             escalonamento.append([(menor, fim_horario)])
@@ -75,8 +75,8 @@ for c in range(6):
 
         desvios_padroes.append(desvio_padrao)
 
-        # print(f"Tempo de execução: {tempo_fim - tempo_inicio:.6f}s")
-        # print(f"Memória utilizada: {peak / 1024:.2f}KB")
+    #     print(f"Tempo de execução: {tempo_fim - tempo_inicio:.6f}s")
+    #     print(f"Memória utilizada: {peak / 1024:.2f}KB")
 
     # print("")
     # for i, recurso in enumerate(escalonamento):

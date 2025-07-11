@@ -71,36 +71,35 @@ def temRecursoDisponivelBalanceado(escalonamento, inicio, fim):
     else:
         return False
     
-def temRecursoDisponivelBalanceadoRoundRobin(escalonamento, inicio, fim, ultimo_rec_alocado):
+def temRecursoDisponivelOtimizada(escalonamento, inicio, fim, ultimo_rec_alocado):
     if not escalonamento:
         return False, 0
    
     num_recursos = len(escalonamento)
-    recursos_disponiveis = {}
-
-    janela_busca = min(12, num_recursos)
-    
+    janela_busca = min(12, num_recursos) # Limita a busca a 12 recursos para balanceamento
     inicio_busca = (ultimo_rec_alocado + 1) % num_recursos
+    
+    melhor_recurso = None
+    menor_carga = float('inf')
 
     for i in range(janela_busca):
         idx = (inicio_busca + i) % num_recursos
         recurso = escalonamento[idx]
-        conflito = False
         
-        for ocupado_inicio, ocupado_fim in recurso:
-            if not (fim <= ocupado_inicio or inicio >= ocupado_fim):
-                conflito = True
-                break
+        conflito = any(not (fim <= oc_inicio or inicio >= oc_fim) 
+                      for oc_inicio, oc_fim in recurso)
             
         if not conflito:
-            carga_total_horas = sum(o_fim - o_inicio for o_inicio, o_fim in recurso)
-            recursos_disponiveis[idx] = carga_total_horas
+            carga_total = sum(oc_fim - oc_inicio for oc_inicio, oc_fim in recurso)
             
-    if recursos_disponiveis:
-        melhor_recurso = min(recursos_disponiveis, key=recursos_disponiveis.get)
-        return melhor_recurso, melhor_recurso
-    else:
-        return False, ultimo_rec_alocado
+            if carga_total == 0:
+                return idx, idx
+            
+            if carga_total < menor_carga:
+                menor_carga = carga_total
+                melhor_recurso = idx
+    
+    return (melhor_recurso, melhor_recurso) if melhor_recurso is not None else (False, ultimo_rec_alocado)
 
 
 def extrai_numeros(arquivos):
