@@ -78,7 +78,7 @@ def temRecursoDisponivelBalanceadoRoundRobin(escalonamento, inicio, fim, ultimo_
     num_recursos = len(escalonamento)
     recursos_disponiveis = {}
 
-    janela_busca = min(15, num_recursos)
+    janela_busca = min(12, num_recursos)
     
     inicio_busca = (ultimo_rec_alocado + 1) % num_recursos
 

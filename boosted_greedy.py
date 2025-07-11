@@ -19,6 +19,8 @@ for c in range(6):
 
     horarios = []
     escalonamento = []
+    
+    ultimo_rec_alocado = 0
 
     contador = 0
     with open(caminho_arq, 'r') as arq:
@@ -29,6 +31,7 @@ for c in range(6):
         horarios = list(zip(horarios_inicio, horarios_fim))
 
     if c != 0:
+        quick_sort(horarios, 0, len(horarios) - 1)
         tracemalloc.start()
         tempo_inicio = time.time()
 
