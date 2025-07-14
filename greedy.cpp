@@ -1,11 +1,12 @@
 #include <iostream>
 #include <stdlib.h>
+#include <chrono>
 #include "utils.h"
 
-#define MAX_HORARIOS 10
+#define MAX_HORARIOS 1000
 
 int main(){
-    FILE* arquivo = fopen("./entries/Aula10.txt", "r");
+    FILE* arquivo = fopen("./entries/Aula1000.txt", "r");
 
     if(arquivo == NULL){
         perror("Erro ao abrir o arquivo");
@@ -16,37 +17,56 @@ int main(){
     ler_arquivo(horarios, arquivo, MAX_HORARIOS);
     quick_sort(horarios, 0, MAX_HORARIOS - 1);
 
-    printf("Horarios lidos:\n");
-    for (int i = 0; i < MAX_HORARIOS; i++) {
-        printf("Horario[%d]: Inicio = %d, Fim = %d\n", 
-               i, horarios[i].inicio, horarios[i].fim);
-    }
+    vector<float> tempoMedio;
+    vector<int> recursosMedio;
+    vector<float> dpMedio;
 
-    int contador_horarios = 0;
-    vector<Recurso> recursos;
+    float tempoLocal = 0;
 
-    while(contador_horarios != MAX_HORARIOS){
-        Horario menor = horarios[contador_horarios];
+    for(int i = 0; i < 6; i++){
+        auto tempo_inicio = std::chrono::high_resolution_clock::now();
 
-        int recursoDisponivel = temRecursoDisponivel(recursos, menor);
-    
-        if(recursoDisponivel == -1){
-            Recurso recurso;
-            recurso.horarios.push_back(menor);
-            recursos.push_back(recurso);
-        } else {
-            recursos[recursoDisponivel].horarios.push_back(menor);
+        int contador_horarios = 0;
+        vector<Recurso> recursos;
+
+        while(contador_horarios != MAX_HORARIOS){
+            Horario menor = horarios[contador_horarios];
+
+            int recursoDisponivel = temRecursoDisponivel(recursos, menor);
+        
+            if(recursoDisponivel == -1){
+                Recurso recurso;
+                recurso.horarios.push_back(menor);
+                recursos.push_back(recurso);
+            } else {
+                recursos[recursoDisponivel].horarios.push_back(menor);
+            }
+
+            contador_horarios++;
         }
 
-        contador_horarios++;
-    }
+        auto tempo_fim = std::chrono::high_resolution_clock::now();
 
-    for(Recurso recurso : recursos){
-        std::cout << "Recurso: [";
-        for(Horario horario : recurso.horarios){
-            std::cout << "(" << horario.inicio << ", " << horario.fim << "), ";
+        if(i != 0){
+            std::chrono::duration<double> duracao = tempo_fim - tempo_inicio;
+            tempoLocal += duracao.count();
         }
-        std::cout << "]" << std::endl;
+
+        if(i == 5){
+            tempoLocal /= 5;
+            tempoMedio.push_back(tempoLocal);
+            std::cout << "Tempo Local: " << tempoLocal << "s" << std::endl;
+            tempoLocal = 0;
+        }
+
+        for(Recurso recurso : recursos){
+            std::cout << "Recurso: [";
+            for(Horario horario : recurso.horarios){
+                std::cout << "(" << horario.inicio << ", " << horario.fim << "), ";
+            }
+            std::cout << "]" << std::endl;
+        }
+
     }
     return 0;
 }
