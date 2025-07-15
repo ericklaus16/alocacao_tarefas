@@ -94,6 +94,37 @@ int temRecursoDisponivel(const vector<Recurso>& recursos, const Horario& horario
     return -1;
 }
 
+int temRecursoDisponivelBalanceado(const vector<Recurso>& recursos, const Horario& horario){
+    int best_idx = -1;
+    int min_horas_totais = -1;
+
+    for(size_t idx = 0; idx < recursos.size(); idx++){
+        bool conflito = false;
+        const auto& recurso_horarios = recursos[idx].horarios;
+
+        for(const auto& horario_ocupado : recurso_horarios){
+            if(!(horario.fim <= horario_ocupado.inicio || horario.inicio >= horario_ocupado.fim)){
+                conflito = true;
+                break; 
+            }
+        }
+
+        if(!conflito){
+            int horas_totais = 0;
+            for(const auto& h : recurso_horarios){
+                horas_totais += (h.fim - h.inicio);
+            }
+            
+            if(best_idx == -1 || horas_totais < min_horas_totais){
+                min_horas_totais = horas_totais;
+                best_idx = idx;
+            }
+        }
+    }
+    
+    return best_idx;
+}
+
 double desvioPadraoPopulacional(const std::vector<Recurso>& recursos) {
     if (recursos.empty()) {
         return 0.0; // Retorna 0 para evitar divisão por zero se o vetor estiver vazio
