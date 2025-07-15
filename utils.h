@@ -1,5 +1,7 @@
 #include <iostream>
 #include <stdlib.h>
+#include <cmath>
+#include <numeric>
 #include <vector>
 
 using namespace std;
@@ -69,24 +71,59 @@ void ler_arquivo(Horario* horarios, FILE* arquivo, int MAX_HORARIOS){
     fclose(arquivo);
 }
 
-int temRecursoDisponivel(vector<Recurso> recursos, Horario horario){
-    int idx = 0;
-    for(Recurso recurso : recursos){
+int temRecursoDisponivel(const vector<Recurso>& recursos, const Horario& horario){
+    for(size_t idx = 0; idx < recursos.size(); idx++){
         bool conflito = false;
+        const auto& recurso_horarios = recursos[idx].horarios;
 
-        for(Horario horario_ocupado : recurso.horarios){
+        if(recurso_horarios.empty()){
+            return idx;
+        }
+
+        for(const auto& horario_ocupado : recurso_horarios){
             if(!(horario.fim <= horario_ocupado.inicio || horario.inicio >= horario_ocupado.fim)){
                 conflito = true;
-                break;
+                break; 
             }
         }
 
         if(!conflito){
             return idx;
         }
+    }
+    return -1;
+}
 
-        idx++;
+double desvioPadraoPopulacional(const std::vector<Recurso>& recursos) {
+    if (recursos.empty()) {
+        return 0.0; // Retorna 0 para evitar divisão por zero se o vetor estiver vazio
     }
 
-    return -1;
+    // Passo 1: Calcular as horas totais de cada recurso
+    std::vector<double> horas_por_recurso;
+    for (const auto& recurso : recursos) {
+        double horas_total = 0.0;
+        for (const auto& horario : recurso.horarios) {
+            horas_total += (horario.fim - horario.inicio);
+        }
+        horas_por_recurso.push_back(horas_total);
+    }
+
+    // Passo 2: Calcular a média das horas
+    double sum = std::accumulate(horas_por_recurso.begin(), horas_por_recurso.end(), 0.0);
+    double mean = sum / horas_por_recurso.size();
+
+    // Passo 3: Calcular a soma dos quadrados das diferenças em relação à média
+    double sq_sum = 0.0;
+    for (const auto& horas : horas_por_recurso) {
+        sq_sum += (horas - mean) * (horas - mean);
+    }
+
+    // Passo 4: Calcular a variância
+    double variance = sq_sum / horas_por_recurso.size();
+
+    // Passo 5: Calcular o desvio padrão (raiz quadrada da variância)
+    double std_dev = std::sqrt(variance);
+
+    return std_dev;
 }
