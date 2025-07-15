@@ -3,10 +3,10 @@
 #include <chrono>
 #include "utils.h"
 
-#define MAX_HORARIOS 10
+#define MAX_HORARIOS 150000
 
 int main(){
-    FILE* arquivo = fopen("./entries/Aula10.txt", "r");
+    FILE* arquivo = fopen("./entries/Aula150000.txt", "r");
 
     if(arquivo == NULL){
         perror("Erro ao abrir o arquivo");
@@ -51,7 +51,7 @@ int main(){
 
         if(i != 0){
             auto duracao_mili = std::chrono::duration_cast<std::chrono::milliseconds>(tempo_fim - tempo_inicio);
-            // double duracao_segundos = duracao_micro.count() / 10000.0;
+            // double duracao_segundos = duracao_micro.count() / 150000000.0;
             tempoLocal += duracao_mili.count();
 
             recursoLocal += recursos.size();

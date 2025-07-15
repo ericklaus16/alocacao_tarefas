@@ -96,7 +96,7 @@ int temRecursoDisponivel(const vector<Recurso>& recursos, const Horario& horario
 
 int temRecursoDisponivelBalanceado(const vector<Recurso>& recursos, const Horario& horario){
     int best_idx = -1;
-    int min_horas_totais = -1;
+    int min_horas_totais = INT_MAX;
 
     for(size_t idx = 0; idx < recursos.size(); idx++){
         bool conflito = false;
@@ -115,7 +115,7 @@ int temRecursoDisponivelBalanceado(const vector<Recurso>& recursos, const Horari
                 horas_totais += (h.fim - h.inicio);
             }
             
-            if(best_idx == -1 || horas_totais < min_horas_totais){
+            if(horas_totais < min_horas_totais){
                 min_horas_totais = horas_totais;
                 best_idx = idx;
             }
