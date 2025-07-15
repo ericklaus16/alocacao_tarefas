@@ -3,17 +3,17 @@
 #include <chrono>
 #include "utils.h"
 
-#define MAX_HORARIOS 250000
+#define MAX_HORARIOS 10
 
 int main(){
-    FILE* arquivo = fopen("./entries/Aula250000.txt", "r");
+    FILE* arquivo = fopen("./entries/Aula10.txt", "r");
 
     if(arquivo == NULL){
         perror("Erro ao abrir o arquivo");
         return 1;
     }
 
-    Horario horarios[MAX_HORARIOS];
+    vector<Horario> horarios(MAX_HORARIOS);
     ler_arquivo(horarios, arquivo, MAX_HORARIOS);
     quick_sort(horarios, 0, MAX_HORARIOS - 1);
 
@@ -51,7 +51,7 @@ int main(){
 
         if(i != 0){
             auto duracao_mili = std::chrono::duration_cast<std::chrono::milliseconds>(tempo_fim - tempo_inicio);
-            // double duracao_segundos = duracao_micro.count() / 250000000.0;
+            // double duracao_segundos = duracao_micro.count() / 10000.0;
             tempoLocal += duracao_mili.count();
 
             recursoLocal += recursos.size();
@@ -74,5 +74,6 @@ int main(){
             tempoLocal = 0;
         }
     }
+    
     return 0;
 }
