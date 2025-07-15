@@ -15,7 +15,7 @@ typedef struct {
     vector<Horario> horarios;
 } Recurso;
 
-void quick_sort(vector<Horario> horarios, int left, int right){
+void quick_sort(vector<Horario>& horarios, int left, int right){
     int i, j;
     Horario pivo, temp;
 
@@ -51,7 +51,7 @@ void quick_sort(vector<Horario> horarios, int left, int right){
     }
 }
 
-void ler_arquivo(vector<Horario> horarios, FILE* arquivo, int MAX_HORARIOS){
+void ler_arquivo(vector<Horario>& horarios, FILE* arquivo, int MAX_HORARIOS){
     for(int i = 0; i < MAX_HORARIOS; i++){
         if (fscanf(arquivo, "%d", &horarios[i].inicio) != 1) {
             fprintf(stderr, "Erro ao ler o início do horário %d\n", i);
